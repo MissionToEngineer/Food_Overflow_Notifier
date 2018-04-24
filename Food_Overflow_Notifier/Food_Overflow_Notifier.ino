@@ -6,14 +6,16 @@ int sensorPin = 14;  //Optomax Digital Liquid Level Sensor - LLC200D3SH-LLPK1
 bool sensorValue;
 bool lastMessage;
 
-const char* ssid = "INSERT SSID"; 
-const char* password = "INSERT NETWORK PASSWORD"; 
+const char* ssid = "FBI Van"; 
+const char* password = "135willwin"; 
 
 const char* host = "api.pushbullet.com";
 const int httpsPort = 443;
 
 const char* accessToken = "o.V8nnc1aPnV6p96tHOYjtrJxZklx5YzWN"; //Get the access token via your pushbullet account 
 String url = "/v2/pushes";
+
+int initCount = 32; //{"body":,"title":,"type":"note"}
 
 void setup() {
   // put your setup code here, to run once:
@@ -89,8 +91,7 @@ void PrintSensorData(bool response) //this function lets you track sensor value 
   }
 }
 
-void PushSensorData()               //send data to pushbullet, becoming a push notification. this function needs to be 
-                                    //changed with other arguments to be more compatible with a variety of messages
+void PushSensorData(const char* messageTitle. const char* messageBody)               //send data to pushbullet, becoming a push notification. this function needs to be                                  
 {
     // Use WiFiClientSecure class to create TLS connection
   WiFiClientSecure client;
@@ -104,14 +105,16 @@ void PushSensorData()               //send data to pushbullet, becoming a push n
   }
   Serial.print("requesting URL: "); Serial.println(url);
 
+  int messageLength = initCount;
+
   client.print(String("POST ") + url + " HTTP/1.1\r\n" +            //push protocol
          "Host: " + host + "\r\n" +
          "User-Agent: ESP8266\r\n" +
          "Access-Token: " + accessToken + "\r\n" +
-         "Content-length: 65\r\n"                                  //message character length => {"body":"WATER SPILL!","title":"Ella Notification","type":"note"}
-         "Content-Type: application/json\r\n" +
+         "Content-length: " + messageLength +"\r\n"                                  //message character length => {"body":"WATER SPILL!","title":"Ella Notification","type":"note"}
+         "Content-Type: application/json\r\n" +                                     
          "Connection: close\r\n\r\n" +
-         "{\"body\":\"WATER SPILL!\",\"title\":\"Ella Notification\",\"type\":\"note\"}");
+         "{\"body\":\"" + messageBody + "\",\"title\":\"" + messageTitle + "\",\"type\":\"note\"}");
   Serial.println("Notification pushed!");
 }
 
