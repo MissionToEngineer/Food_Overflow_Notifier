@@ -6,16 +6,16 @@ int sensorPin = 14;  //Optomax Digital Liquid Level Sensor - LLC200D3SH-LLPK1
 bool sensorValue;
 bool lastMessage;
 
-const char* ssid = "FBI Van"; 
-const char* password = "135willwin"; 
+const char* ssid = "NETWORK_NAME"; 
+const char* password = "PASSWORD"; 
 
 const char* host = "api.pushbullet.com";
 const int httpsPort = 443;
 
-const char* accessToken = "o.V8nnc1aPnV6p96tHOYjtrJxZklx5YzWN"; //Get the access token via your pushbullet account 
+const char* accessToken = "YOUR_ACCESS_TOKEN"; //access token via your pushbullet account 
 String url = "/v2/pushes";
 
-int initCount = 32; //{"body":,"title":,"type":"note"}
+int initCount = 36; //{"body":,"title":,"type":"note"}""""
 
 void setup() {
   // put your setup code here, to run once:
@@ -50,7 +50,6 @@ void loop()
  sensorValue = ReadSensor();     //reads the sensor
  if (lastMessage == sensorValue) //do nothing if the signal remains the same
  {
-  
  }
 
  else if (lastMessage!= sensorValue) //if new signal does not match first signal then...
@@ -59,7 +58,7 @@ void loop()
 
   if (sensorValue)                   //if the signal shows that water has been detected,
   {                                 // then send that as push notification
-    PushSensorData();
+    PushSensorData("ELLA FOOD NOTIFICATION!", "FOOD OVERFLOW DETECTED!");
      
   }
   lastMessage = sensorValue; //change the last recorded value. 
@@ -91,7 +90,7 @@ void PrintSensorData(bool response) //this function lets you track sensor value 
   }
 }
 
-void PushSensorData(const char* messageTitle. const char* messageBody)               //send data to pushbullet, becoming a push notification. this function needs to be                                  
+void PushSensorData(const char* messageTitle, const char* messageBody)               //send data to pushbullet, becoming a push notification. this function needs to be                                  
 {
     // Use WiFiClientSecure class to create TLS connection
   WiFiClientSecure client;
@@ -107,14 +106,19 @@ void PushSensorData(const char* messageTitle. const char* messageBody)          
 
   int messageLength = initCount;
 
+  messageLength = messageLength + strlen(messageTitle);
+  messageLength = messageLength + strlen(messageBody);
+
+  Serial.println(messageLength);
+
   client.print(String("POST ") + url + " HTTP/1.1\r\n" +            //push protocol
          "Host: " + host + "\r\n" +
          "User-Agent: ESP8266\r\n" +
          "Access-Token: " + accessToken + "\r\n" +
-         "Content-length: " + messageLength +"\r\n"                                  //message character length => {"body":"WATER SPILL!","title":"Ella Notification","type":"note"}
+         "Content-length: " + messageLength + "\r\n"                                  
          "Content-Type: application/json\r\n" +                                     
          "Connection: close\r\n\r\n" +
          "{\"body\":\"" + messageBody + "\",\"title\":\"" + messageTitle + "\",\"type\":\"note\"}");
+         
   Serial.println("Notification pushed!");
 }
-
